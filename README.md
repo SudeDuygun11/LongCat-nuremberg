@@ -8,7 +8,7 @@ Team **LongCat**'s entry to the Huawei 2026 Nuremberg Tech Arena, Topic 2 (Phase
 
 ## Overview
 
-- **Motivation:** [TODO]
+- **Motivation:** Forecast county-level power outages from a single public signal (EAGLE-I telemetry) for the Digital Power topic of the Huawei 2026 Nuremberg Tech Arena, with every input auditable against the forecast issue time.
 - **Problem context:** Rolling forecasts of county-level electricity outage ratio from EAGLE-I outage data (v4), with strict issue-time causality.
 - **Main objective:** Predict a continuous, finite outage ratio clipped to `[0, 1]` for every declared county, issue time, and lead.
 - **Expected outcome:** A hash-bound release consisting of the model, frozen issue-time features, `predictions.csv`, a technical report, and validation evidence.
@@ -33,10 +33,10 @@ Team **LongCat**'s entry to the Huawei 2026 Nuremberg Tech Arena, Topic 2 (Phase
 - [x] Validation on Sep–Nov 2024 expanding-window replay
 - [x] Combined Task A/B `predictions.csv` and submission validator
 - [x] Technical report (`LongCat_Challenge2.pdf`) and release manifest
-- [ ] Work in progress: [TODO]
-- [ ] Planned experiment/feature: [TODO]
-- [ ] Final evaluation: [TODO]
-- [ ] Documentation: [TODO]
+- [ ] Work in progress: independently confirm the official portal filename and submission cutoff (see `FINAL_CHECKLIST.md`)
+- [ ] Planned experiment/feature: add an issue-time weather forecast signal (the main current limitation)
+- [ ] Final evaluation: organizer/leaderboard score (only local replay validation exists so far)
+- [x] Documentation: README, model card, data/license notes, submission schema, technical report
 
 ## Objectives
 
@@ -130,8 +130,16 @@ Validation metrics are in `artifacts/validation_metrics.csv` and `artifacts/vali
 
 | Task | Metric | Value |
 |---|---|---|
-| A | MAE | [TODO] |
-| B | MAE | [TODO] |
+| A | MAE | 6.32e-05 |
+| B | MAE | 6.58e-05 |
+
+Sep–Nov 2024 expanding-window replay (18,665 Task-A rows, 36,658 Task-B rows), MAE on the outage ratio:
+
+| Method | Task A | Task B |
+|---|---|---|
+| Last observation | 9.78e-05 | 8.12e-05 |
+| Weekly routine | 6.67e-05 | 6.78e-05 |
+| **Tideglass (full)** | **6.32e-05** | **6.58e-05** |
 
 Public-replay diagnostics are local validation evidence, not an organizer or leaderboard score.
 
@@ -143,11 +151,13 @@ Public-replay diagnostics are local validation evidence, not an organizer or lea
 
 ## Data and Licenses
 
-EAGLE-I v4 is licensed CC BY 4.0. Software dependencies are pinned in `requirements.lock`. See [DATA_AND_LICENSES.md](DATA_AND_LICENSES.md). Repository license: [TODO]
+EAGLE-I v4 is licensed CC BY 4.0. Software dependencies are pinned in `requirements.lock`. See [DATA_AND_LICENSES.md](DATA_AND_LICENSES.md). No repository license file has been added yet.
 
 ## Roadmap
 
-- [ ] [TODO]
+- [ ] Add an issue-time weather forecast input to address unseen storm onsets
+- [ ] Obtain and record the official organizer score
+- [ ] Add a repository license
 
 ## Contact
 
