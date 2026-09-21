@@ -1,0 +1,51 @@
+@page { size: A4; margin: 0; }
+:root { --ivory:#f6f1e7; --teal:#0f766e; --mint:#8bd4c8; --charcoal:#263238; --sand:#d8a15d; --rule:#c9c0ae; --soft:#ebe4d7; }
+* { box-sizing: border-box; }
+body { margin:0; background:#ddd; color:var(--charcoal); font-family:"Avenir Next","Helvetica Neue",Arial,sans-serif; }
+.page { position:relative; width:210mm; height:297mm; padding:17mm 17mm 14mm 18mm; background:var(--ivory); overflow:hidden; page-break-after:always; }
+.page:last-child { page-break-after:auto; }
+.page::before { content:""; position:absolute; left:0; top:0; bottom:0; width:5mm; background:var(--teal); }
+.header { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:3mm; margin-bottom:5mm; font-size:8pt; letter-spacing:.11em; text-transform:uppercase; }
+.header b { color:var(--teal); }
+.footer { position:absolute; left:18mm; right:17mm; bottom:7mm; display:flex; justify-content:space-between; font-size:7.5pt; color:#657075; border-top:1px solid var(--rule); padding-top:2mm; }
+h1 { margin:0; font-size:27pt; line-height:1.05; letter-spacing:-.04em; font-weight:650; }
+h2 { font-size:18pt; line-height:1.12; margin:0 0 4mm; letter-spacing:-.025em; }
+h3 { font-size:10.8pt; margin:0 0 1.5mm; color:var(--teal); text-transform:uppercase; letter-spacing:.06em; }
+p, li { font-size:9.2pt; line-height:1.42; }
+p { margin:0 0 3mm; }
+ul { margin:1mm 0 3mm 5mm; padding-left:4mm; }
+li { margin-bottom:1.2mm; }
+.kicker { color:var(--teal); font-size:10pt; font-weight:700; letter-spacing:.13em; text-transform:uppercase; margin-bottom:4mm; }
+.lede { font-size:13pt; line-height:1.4; max-width:155mm; color:#354247; margin:4mm 0 6mm; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+.grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:4mm; }
+.card { background:rgba(255,255,255,.38); border:1px solid var(--rule); border-radius:2.5mm; padding:4mm; }
+.card strong.metric { display:block; color:var(--teal); font-size:20pt; line-height:1; margin-bottom:2mm; }
+.note { border-left:3px solid var(--sand); background:#f0e8da; padding:3mm 4mm; font-size:8.8pt; line-height:1.4; }
+.figure { width:100%; display:block; margin:2mm auto 4mm; }
+.figure.short { height:50mm; }
+.figure.medium { height:68mm; }
+.figure.tall { height:82mm; }
+.caption { font-size:7.5pt; color:#637075; margin-top:-2mm; }
+table { width:100%; border-collapse:collapse; margin:2mm 0 4mm; font-size:8.1pt; }
+th { text-align:left; background:var(--teal); color:white; padding:2.1mm; font-weight:600; }
+td { padding:2mm; border-bottom:1px solid var(--rule); vertical-align:top; }
+tr:nth-child(even) td { background:rgba(255,255,255,.28); }
+.cover { padding-top:20mm; }
+.cover h1 { font-size:35pt; max-width:165mm; }
+.cover .subtitle { font-size:16pt; line-height:1.25; margin-top:3mm; color:var(--teal); }
+.identity { margin-top:6mm; display:grid; grid-template-columns:36mm 1fr; border-top:2px solid var(--charcoal); border-bottom:2px solid var(--charcoal); }
+.identity div { padding:2.3mm 2mm; border-bottom:1px solid var(--rule); font-size:9pt; }
+.identity div:nth-last-child(-n+2) { border-bottom:0; }
+.identity .label { text-transform:uppercase; letter-spacing:.08em; font-size:7.5pt; color:#657075; }
+.cover-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:3mm; margin-top:4mm; }
+.cover-strip div { background:var(--charcoal); color:white; padding:3mm; font-size:8pt; }
+.cover-strip b { display:block; color:var(--mint); font-size:15pt; }
+.hash { font-family:"SFMono-Regular",Consolas,monospace; font-size:7.2pt; word-break:break-all; }
+.small { font-size:7.8pt; line-height:1.4; }
+.tight p, .tight li { font-size:8.5pt; line-height:1.34; }
+.callout { color:var(--teal); font-size:15pt; line-height:1.25; font-weight:600; margin:2mm 0 4mm; }
+.step { display:flex; gap:3mm; margin-bottom:3mm; }
+.step .num { min-width:8mm; height:8mm; border-radius:50%; background:var(--teal); color:white; text-align:center; padding-top:1.2mm; font-weight:700; font-size:8pt; }
+code { font-family:"SFMono-Regular",Consolas,monospace; background:var(--soft); padding:.2mm 1mm; border-radius:1mm; font-size:8pt; }
+pre { background:var(--charcoal); color:#f8f4ec; padding:3mm; border-radius:2mm; font-size:7pt; line-height:1.45; white-space:pre-wrap; }

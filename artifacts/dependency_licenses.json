@@ -1,0 +1,12 @@
+{
+  "Jinja2": "BSD-3-Clause",
+  "joblib": "BSD-3-Clause",
+  "kaleido": "MIT",
+  "numpy": "BSD-3-Clause",
+  "pandas": "BSD-3-Clause",
+  "plotly": "MIT",
+  "pypdf": "BSD-3-Clause",
+  "requests": "Apache-2.0",
+  "scikit-learn": "BSD-3-Clause",
+  "scipy": "BSD-3-Clause"
+}

@@ -1,0 +1,56 @@
+{
+  "county_denominator_source": "MCC.csv Customers keyed by zero-padded county FIPS",
+  "eaglei": {
+    "citation": "Brelsford, Christa; Tennille, Sarah; Myers, Aaron; Chinthavali, Supriya; Tansakul, Varisara; Denman, Matthew; et al. (2023). The Environment for Analysis of Geo-Located Energy Information\u2019s Recorded Electricity Outages 2014-2025. figshare. Dataset. https://doi.org/10.6084/m9.figshare.24237376.v4",
+    "doi": "10.6084/m9.figshare.24237376.v4",
+    "files": {
+      "MCC.csv": {
+        "download_url": "https://ndownloader.figshare.com/files/42547708",
+        "md5": "7e30d47d44cae46b3342cdabf7c84b7f",
+        "size": 40584
+      },
+      "eaglei_outages_2023.csv": {
+        "download_url": "https://ndownloader.figshare.com/files/44574907",
+        "md5": "4ef3f9290884b4151a43333d28f67369",
+        "size": 1199752423
+      },
+      "eaglei_outages_2024.csv": {
+        "download_url": "https://ndownloader.figshare.com/files/53581661",
+        "md5": "13183facf56c196c061a238303c87973",
+        "size": 1444846424
+      },
+      "eaglei_outages_2025.csv": {
+        "download_url": "https://ndownloader.figshare.com/files/62164877",
+        "md5": "cd2feb1282a42fb048cb6885398bc1cc",
+        "size": 1402347695
+      }
+    },
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "value": 1
+    },
+    "title": "The Environment for Analysis of Geo-Located Energy Information\u2019s Recorded Electricity Outages 2014-2025"
+  },
+  "model_release": {
+    "calibration_evaluation": "untouched 2024 forward replay",
+    "calibration_selection": "2023 forward replay",
+    "method": "Tideglass renewal plus groupwise MAE calibration",
+    "test_truth_used_for_fitting": false
+  },
+  "organizer_contract": {
+    "phase": "Topic 2 Phase 1",
+    "schema": [
+      "task_id",
+      "fips_code",
+      "county",
+      "state",
+      "issue_time",
+      "target_time",
+      "predicted_x"
+    ],
+    "source": "Submission Guidelines \u2014 Phase 1 and predictions_template_EN-AIDC.csv",
+    "test_window": "2025-09-01 through 2025-11-30 UTC"
+  },
+  "prediction_sha256": "ddb7129d0123d5e765a26c78ca0f453b91b749bbd12ceef43edec5b0eb75d1b2"
+}

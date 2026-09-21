@@ -1,0 +1,52 @@
+{
+  "project": {
+    "team_name": "LongCat",
+    "participant_name": "Sude Duygun",
+    "contact": "sudeduygun11@gmail.com",
+    "challenge": "Huawei 2026 Nuremberg Tech Arena - Digital Power, Topic 2, Phase 1",
+    "method_name": "Tideglass Causal Renewal Forecaster",
+    "submission_date": "2026-08-31"
+  },
+  "seed": 41729,
+  "counties": [
+    {"fips_code": "17031", "county": "Cook", "state": "Illinois", "customers": 2162007, "latitude": 41.84, "longitude": -87.82},
+    {"fips_code": "34003", "county": "Bergen", "state": "New Jersey", "customers": 418357, "latitude": 40.96, "longitude": -74.07},
+    {"fips_code": "36047", "county": "Kings", "state": "New York", "customers": 915206, "latitude": 40.65, "longitude": -73.95},
+    {"fips_code": "36081", "county": "Queens", "state": "New York", "customers": 847158, "latitude": 40.73, "longitude": -73.79},
+    {"fips_code": "36103", "county": "Suffolk", "state": "New York", "customers": 657677, "latitude": 40.87, "longitude": -72.92}
+  ],
+  "contract": {
+    "test_window_start": "2025-09-01T00:00:00Z",
+    "test_window_end_exclusive": "2025-12-01T00:00:00Z",
+    "task_a": {"first_issue": "2025-08-31T00:00:00Z", "last_issue": "2025-11-30T00:00:00Z", "issue_frequency_hours": 24, "lead_minutes": [60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840, 900, 960, 1020, 1080, 1140, 1200, 1260, 1320, 1380, 1440, 1500, 1560, 1620, 1680, 1740, 1800, 1860, 1920, 1980, 2040, 2100, 2160, 2220, 2280, 2340, 2400, 2460, 2520, 2580, 2640, 2700, 2760, 2820, 2880]},
+    "task_b": {"first_issue": "2025-08-31T18:00:00Z", "last_issue": "2025-11-30T18:00:00Z", "issue_frequency_hours": 6, "lead_minutes": [15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 285, 300, 315, 330, 345, 360]},
+    "expected_rows": 65880,
+    "task_a_rows": 22080,
+    "task_b_rows": 43800
+  },
+  "model": {
+    "ridge_alpha": 100.0,
+    "target_transform": "log1p_customers_out",
+    "task_a_last_state_blend": 0.0,
+    "task_b_last_state_blend": 0.2,
+    "calibration": {
+      "selection_fold": "2023-09-01 through 2023-11-30",
+      "final_fit_fold": "2024-09-01 through 2024-11-30",
+      "task_a_groups": ["fips_code", "lead_minutes"],
+      "task_a_shrinkage_rows": 0,
+      "task_b_groups": ["lead_minutes"],
+      "task_b_shrinkage_rows": 500,
+      "scale_bounds": [0.1, 1.5]
+    },
+    "training_years": [2023, 2024, 2025],
+    "training_cutoff_utc": "2025-08-31T23:59:59Z",
+    "issue_state_observation_rule": "timestamp <= issue_time",
+    "random_seed": 41729
+  },
+  "release_confirmation": {
+    "official_phase1_contract_installed": true,
+    "exact_row_universe_validated": true,
+    "frozen_inference_reproduces_bytes": true,
+    "identity_complete": true
+  }
+}

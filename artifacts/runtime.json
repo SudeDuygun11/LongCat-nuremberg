@@ -1,0 +1,12 @@
+{
+  "final_training_rows": 614421,
+  "frozen_inference_rows": 65880,
+  "joblib": "1.5.3",
+  "numpy": "2.0.2",
+  "pandas": "2.3.3",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "python": "3.9.6",
+  "scikit_learn": "1.6.1",
+  "seed": 41729,
+  "training_seconds": 12.91
+}

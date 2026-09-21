@@ -1,0 +1,9 @@
+data/raw/
+data/cache/
+build/
+tmp/
+__pycache__/
+*.pyc
+.DS_Store
+data/selected_raw/
+data/work/

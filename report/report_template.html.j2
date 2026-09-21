@@ -1,0 +1,162 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Tideglass Technical Report</title><link rel="stylesheet" href="styles.css"></head><body>
+<section class="page cover">
+  <div class="kicker">Huawei 2026 Nuremberg Tech Arena · Digital Power · Topic 2</div>
+  <h1>Tideglass</h1><div class="subtitle">A causal renewal forecaster for county power-outage ratios</div>
+  <p class="lede">A complete Phase-1 system for repeated 48-hour and 6-hour forecasts: sparse county telemetry enters at a declared issue-time boundary, renewal states summarize what is knowable, and two regularized task heads emit continuous outage ratios.</p>
+  <div class="identity">
+    <div class="label">Team</div><div><b>{{ team_name }}</b></div>
+    <div class="label">Participant</div><div><b>{{ participant_name }}</b></div>
+    <div class="label">Contact</div><div><b>{{ contact }}</b></div>
+    <div class="label">Project</div><div>Tideglass Causal Renewal Forecaster</div>
+    <div class="label">Submission date</div><div>31 August 2026</div>
+  </div>
+  <img class="figure tall" src="figures/cover_system.svg">
+  <div class="cover-strip"><div><b>65,880</b>combined prediction rows</div><div><b>5</b>fixed EAGLE-I counties</div><div><b>1 command</b>byte-exact reproduction</div></div>
+  <div class="footer"><span>Standalone technical report</span><span>01 / 07</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>Evidence boundary</b><span>Acquisition and preprocessing</span></div>
+  <h2>One public signal, five deliberately observable counties</h2>
+  <p class="callout">The design starts with the scoring source itself, then treats every absent record as unknown—not as proof of zero outage.</p>
+  <div class="grid2">
+    <div>
+      <h3>Source and spatial key</h3>
+      <p>EAGLE-I v4 supplies county outage counts at a nominal 15-minute cadence. `MCC.csv` supplies the organizer-linked fixed customer denominator. We join only on the zero-padded five-digit FIPS code; county and state strings are explanatory fields, never keys.</p>
+      <p>The chosen set spans one Midwestern metropolitan system and four Northeast systems. Large customer bases reduce ratio quantization; repeated 2023–2025 coverage supports rolling-state construction; the New York / New Jersey cluster also permits a contemporaneous regional context signal.</p>
+    </div>
+    <div class="card tight">
+      <h3>Preprocessing decisions</h3>
+      <ul>
+        <li>Parse raw timestamps as UTC and collapse exact duplicate county/timestamp rows by mean.</li>
+        <li>Task A target for validation: mean of available quarter-hour values in the hour ending at the hourly target.</li>
+        <li>Task B target: native 15-minute observation.</li>
+        <li>Do not densify an absent target to zero; exclude it from local metric denominators.</li>
+        <li>At inference, last-observation and lag features use only timestamps at or before the issue time.</li>
+      </ul>
+    </div>
+  </div>
+  <table><thead><tr><th>FIPS</th><th>County</th><th>State</th><th>MCC customers</th><th>Selection role</th></tr></thead><tbody>{% for c in counties %}<tr><td>{{ c.fips_code }}</td><td>{{ c.county }}</td><td>{{ c.state }}</td><td>{{ c.customers_fmt }}</td><td>{{ c.role }}</td></tr>{% endfor %}</tbody></table>
+  <img class="figure medium" src="figures/coverage.svg">
+  <p class="caption">Observed EAGLE-I rows divided by nominal quarter-hour slots. The rising coverage is why missing rows remain explicit rather than being confused with zero-customer outages.</p>
+  <div class="footer"><span>Tideglass · {{ team_name }}</span><span>02 / 07</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>Exploration</b><span>Signals translated into controls</span></div>
+  <h2>Persistence is strong; magnitudes are not well behaved</h2>
+  <div class="grid2">
+    <div>
+      <p class="callout">The median adjacent-quarter log correlation is {{ median_corr }}, while each county’s 99th percentile is many times its routine median.</p>
+      <p>This combination argues against a single unconstrained level regression. Tideglass separates the stable part of the process—county scale, seasonality and recurrence—from an issue-time renewal path that can carry an active event into the short horizon.</p>
+      <h3>Feature families</h3>
+      <ul>
+        <li><b>Current state:</b> last value, staleness, 1-hour median, 6-hour mean/max/trend.</li>
+        <li><b>Slow state:</b> 24-hour median/max and 7-day median / 90th / 99th percentiles.</li>
+        <li><b>Recurrence:</b> causal 1-, 7- and 14-day values with missing indicators.</li>
+        <li><b>Geometry:</b> lead, square-root/log lead, issue hour, target hour and day-of-year cycles.</li>
+        <li><b>Spatial context:</b> the median current ratio across the same five counties.</li>
+      </ul>
+    </div>
+    <div><img class="figure tall" src="figures/exploration.svg"><p class="caption">Left: adjacent-quarter persistence on log counts. Right: p99-to-median magnitude ratio (capped visually at 120×). Both are computed before the 2025 test window where applicable.</p></div>
+  </div>
+  <img class="figure medium" src="figures/feature_layers.svg">
+  <div class="note"><b>Why no weather feature?</b> The organizer requires genuine forecasts available at each issue time; target-time observations or stitched hindsight weather would leak. The system uses an auditable outage-renewal path rather than an incomplete archive. The limitation is explicit: an unseen event onset cannot be anticipated until it appears in available telemetry.</div>
+  <div class="footer"><span>Tideglass · {{ team_name }}</span><span>03 / 07</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>Method</b><span>Model and inference</span></div>
+  <h2>Two convex heads, renewal, and historical MAE calibration</h2>
+  <img class="figure tall" src="figures/model_pipeline.svg">
+  <div class="grid2 tight">
+    <div>
+      <h3>Task A · structural renewal</h3>
+      <p>A task-specific Ridge pipeline predicts `log1p(customers_out)` for +1h through +48h. One-hot county and lead bands combine with standardized continuous features. Long leads naturally lean on slow state, recurrence and calendar structure; no direct persistence override is applied.</p>
+      <h3>Task B · short-horizon renewal</h3>
+      <p>The same regularized convex family is fitted at +15m through +6h. The output is blended with 20% of the last available outage count. That weight was fixed before the sealed release and improves the forward replays’ short-horizon tail behavior.</p>
+    </div>
+    <div>
+      <h3>Imbalance handling</h3>
+      <p>Outage magnitude is long-tailed rather than cleanly binary. The log target limits domination by rare extremes. Sample weight `1 + min(log1p(y)/10, 1.5)` gives large events up to 2.5× influence while keeping routine intervals central to MAE.</p>
+      <h3>Historical MAE calibration</h3>
+      <p>A groupwise weighted-median scale corrects the Ridge heads' positive-event magnitude for MAE: county × lead for Task A, and lead with 500-row shrinkage for Task B. The form was selected on the 2023 forward replay, evaluated once on untouched 2024, then refit from historical 2024 out-of-fold predictions for the sealed model.</p>
+      <h3>Projection</h3>
+      <p>Calibrated counts are divided by the county-specific MCC customer count and clipped to `[0,1]`. The model emits a continuous ratio; it never rounds back to customer lattice points.</p>
+    </div>
+  </div>
+  <div class="grid3"><div class="card"><strong class="metric">206,818</strong><span>final Task-A training rows</span></div><div class="card"><strong class="metric">407,603</strong><span>final Task-B training rows</span></div><div class="card"><strong class="metric">41,729</strong><span>fixed seed</span></div></div>
+  <div class="footer"><span>Tideglass · {{ team_name }}</span><span>04 / 07</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>Evidence</b><span>Temporal validation and ablation</span></div>
+  <h2>Untouched forward replay confirms the calibrated release</h2>
+  <p>The Sep–Nov 2023 expanding-window replay selects the declared calibration form; the untouched Sep–Nov 2024 replay evaluates it. Every replay trains only on earlier information, and missing EAGLE-I targets are excluded rather than invented. These are local public-data diagnostics—not an organizer or leaderboard score.</p>
+  <img class="figure tall" src="figures/validation.svg">
+  <table><thead><tr><th>2024 replay</th><th>Task</th><th>Rows</th><th>MAE</th><th>RMSE</th><th>Top-decile MAE</th><th>Correlation</th></tr></thead><tbody>{% for row in validation_rows %}<tr><td>{{ row.method }}</td><td>{{ row.task_id }}</td><td>{{ row.rows }}</td><td>{{ row.mae }}</td><td>{{ row.rmse }}</td><td>{{ row.tail }}</td><td>{{ row.corr }}</td></tr>{% endfor %}</tbody></table>
+  <p class="caption">Error units are outage-ratio points. Full fold and method records—including bias, p95 absolute error and correlation—are packaged in `artifacts/validation_metrics.csv`.</p>
+  <div class="grid2">
+    <div class="card"><h3>Task A result</h3><p>Against last observation, the full model lowers 2024 MAE by {{ a_mae_gain }} and RMSE by {{ a_rmse_gain }}. Calibration further lowers MAE versus the frozen structural head while retaining its lead/calendar signal.</p></div>
+    <div class="card"><h3>Task B result</h3><p>The renewal-plus-calibration path lowers MAE by {{ b_mae_gain }} and RMSE by {{ b_rmse_gain }} versus last observation. Calibration also improves MAE and correlation versus the pre-calibration output, with a modest top-decile MAE tradeoff.</p></div>
+  </div>
+  <div class="footer"><span>Tideglass · {{ team_name }}</span><span>05 / 07</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>Release</b><span>Contract and causal audit</span></div>
+  <h2>The submitted file is a frozen inference product</h2>
+  <div class="grid2">
+    <div><img class="figure tall" src="figures/causal_audit.svg"></div>
+    <div>
+      <h3>Exact row universe</h3>
+      <ul>
+        <li><b>Task A:</b> 92 daily issues × 5 counties × 48 hourly leads = 22,080.</li>
+        <li><b>Task B:</b> 365 six-hourly issues × 5 counties × 24 quarter-hour leads = 43,800.</li>
+        <li>Primary key: task, FIPS, issue time, target time.</li>
+        <li>All timestamps are canonical UTC; every ratio is finite and within bounds.</li>
+      </ul>
+      <h3>Leakage control</h3>
+      <p>Every frozen row stores the latest source timestamp used. An executable assertion verifies `max_source_timestamp ≤ issue_time`. A target can overlap another batch and remains a separate scored row. The inference file contains features and keys, but no target label.</p>
+      <h3>Prediction distribution</h3>
+      <img class="figure short" src="figures/prediction_distribution.svg">
+    </div>
+  </div>
+  <div class="note"><b>Release binding.</b> Model, input and output hashes are validated before packaging. Frozen inference regenerates the submitted CSV byte for byte; retraining is not part of that reproduction path.</div>
+  <p class="hash"><b>predictions.csv SHA-256</b><br>{{ prediction_hash }}</p>
+  <div class="footer"><span>Tideglass · {{ team_name }}</span><span>06 / 07</span></div>
+</section>
+
+<section class="page">
+  <div class="header"><b>Handoff</b><span>Sources, licenses and reproduction</span></div>
+  <h2>One complete, reproducible release unit</h2>
+  <div class="grid2 tight">
+    <div>
+      <h3>Sources and licenses</h3>
+      <p><b>EAGLE-I / Figshare.</b> “The Environment for Analysis of Geo-Located Energy Information’s Recorded Electricity Outages 2014–2025,” v4, DOI `10.6084/m9.figshare.24237376.v4`; files for 2023–2025 plus `MCC.csv`; CC BY 4.0.</p>
+      <p><b>Organizer specification.</b> Phase-1 submission guideline and illustrative CSV define the task, schema, horizons, five-county choice and test window; specification material only.</p>
+      <p><b>Software.</b> NumPy, pandas, scikit-learn, SciPy, Requests, joblib, Plotly, Kaleido, Jinja2 and pypdf. Exact versions and SPDX-style license identifiers are packaged.</p>
+      <h3>Known operating limits</h3>
+      <ul><li>No unseen weather-onset anticipation.</li><li>Reporting gaps remain missing, so telemetry staleness is a feature.</li><li>MCC denominator revisions require a new bound release.</li><li>Results are county-ratio forecasts, not Phase-2 architecture risk.</li></ul>
+    </div>
+    <div>
+      <h3>Exact reproduction</h3>
+      <pre>cd /path/to/LongCat_Challenge2
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.lock
+PYTHONPATH=src python scripts/predict.py \
+  --output reproduced_predictions.csv
+sha256sum predictions.csv \
+  reproduced_predictions.csv</pre>
+      <h3>Final verification</h3>
+      <div class="step"><div class="num">1</div><p>Reproduce `predictions.csv` and confirm the published SHA-256 value.</p></div>
+      <div class="step"><div class="num">2</div><p>Run the release preflight to verify schema, causality, report and archive integrity.</p></div>
+      <div class="step"><div class="num">3</div><p>Confirm the official portal filename, authorization and cutoff.</p></div>
+    </div>
+  </div>
+  <div class="cover-strip"><div><b>PDF</b>technical evidence</div><div><b>CSV</b>exact predictions</div><div><b>ZIP</b>code + frozen artifacts</div></div>
+  <p class="lede" style="font-size:11pt;margin-top:5mm">Prepared by {{ participant_name }} for team {{ team_name }}. Method, data provenance, frozen inference, validation evidence and release bindings are complete and included.</p>
+  <div class="footer"><span>Tideglass · {{ team_name }}</span><span>07 / 07</span></div>
+</section>
+</body></html>
